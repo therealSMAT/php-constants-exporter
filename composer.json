@@ -1,0 +1,17 @@
+{
+  "name": "therealsmat/php-constants-exporter",
+  "description": "A simple utility library that exports php constants for use on the frontend.",
+  "type": "library",
+  "keywords": ["php", "constants", "share", "export", "javascript"],
+  "license": "MIT",
+  "authors": [{
+    "name": "Tosin Soremekun",
+    "email": "me@tosinsoremekun.com",
+    "role": "Developer"
+  }],
+  "autoload": {
+    "psr-4": {
+      "Therealsmat\\": "src/"
+    }
+  }
+}
