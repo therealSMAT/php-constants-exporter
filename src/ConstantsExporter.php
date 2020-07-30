@@ -14,8 +14,15 @@ class ConstantsExporter
     const INDENTATION_CHARACTER = '    '; // 4 spaces instead of a tab
     const DESTINATION_FILE_EXTENSION = '.js';
 
-    private FileService $fileService;
-    private array $constantsToExport = [];
+    /**
+     * @var FileService
+     */
+    private $fileService;
+
+    /**
+     * @var array
+     */
+    private $constantsToExport = [];
 
     /**
      * ConstantsExporter constructor.

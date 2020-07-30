@@ -2,6 +2,7 @@
 
 namespace Tests;
 
+use Mockery;
 use PHPUnit\Framework\TestCase;
 use Therealsmat\ConstantsExporter;
 use Therealsmat\Services\FileService;
@@ -19,31 +20,35 @@ class ConstantsExporterTest extends TestCase
 
     public function testConstantsAreExportedToCorrectPaths()
     {
-        $mock = \Mockery::mock('overload:' . FileService::class);
-        $mock->allows()->put(SimpleConstantsStub::$jsFileName, SimpleConstantsStub::content())
-            ->once()->andReturn(\Mockery::type('int'));
+        $mock = Mockery::mock('overload:' . FileService::class);
+        $mock->allows()
+            ->put(SimpleConstantsStub::$jsFileName, SimpleConstantsStub::content())
+            ->once()
+            ->andReturn(Mockery::type('int'));
 
         try {
-            $performed = (new ConstantsExporter())->setConstantsToExport([
-                SimpleConstantsStub::class => self::FILE_DIR
-            ])->perform();
+            $performed = (new ConstantsExporter())
+                ->setConstantsToExport([SimpleConstantsStub::class => self::FILE_DIR])
+                ->perform();
 
             $this->assertTrue($performed);
         } catch (ConstantsNotExportedException $e) {
-            var_dump($e->getMessage());
+            //
         }
     }
 
     public function testConstantsCanBePassedFromTheConstructor()
     {
-        $mock = \Mockery::mock('overload:' . FileService::class);
-        $mock->allows()->put(SimpleConstantsStub::$jsFileName, SimpleConstantsStub::content())
-            ->once()->andReturn(\Mockery::type('int'));
+        $mock = Mockery::mock('overload:' . FileService::class);
+        $mock->allows()
+            ->put(SimpleConstantsStub::$jsFileName, SimpleConstantsStub::content())
+            ->once()
+            ->andReturn(Mockery::type('int'));
 
         try {
-            $performed = (new ConstantsExporter([
-                SimpleConstantsStub::class => self::FILE_DIR
-            ]))->perform();
+            $performed = (new ConstantsExporter(
+                [SimpleConstantsStub::class => self::FILE_DIR]
+            ))->perform();
 
             $this->assertTrue($performed);
         } catch (ConstantsNotExportedException $e) {
