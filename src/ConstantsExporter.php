@@ -2,38 +2,72 @@
 
 namespace Therealsmat;
 
+use Therealsmat\Services\FileService;
+use Therealsmat\Exceptions\ConstantsNotExportedException;
+
+/**
+ * Class ConstantsExporter
+ * @package Therealsmat
+ */
 class ConstantsExporter
 {
-    private array $constantsSourceToDestination = [];
-    private string $destinationFileExt = '.js';
-    private string $indentationCharacter = '    '; // 4 spaces instead of a tab
+    const INDENTATION_CHARACTER = '    '; // 4 spaces instead of a tab
+    const DESTINATION_FILE_EXTENSION = '.js';
 
-    public function setConstantsSourceToDestination(array $constantsSourceToDestination): self
+    private FileService $fileService;
+    private array $constantsToExport = [];
+
+    /**
+     * ConstantsExporter constructor.
+     * @param array $constantsToExport
+     */
+    public function __construct(array $constantsToExport = [])
     {
-        $this->constantsSourceToDestination = $constantsSourceToDestination;
+        $this->constantsToExport = $constantsToExport;
+        $this->fileService = new FileService;
+    }
+
+    /**
+     * @param array $constantsToExport
+     * @return $this
+     */
+    public function setConstantsToExport(array $constantsToExport): self
+    {
+        $this->constantsToExport = $constantsToExport;
         return $this;
     }
 
-    public function perform()
+    /**
+     * @return bool
+     * @throws ConstantsNotExportedException
+     */
+    public function perform(): bool
     {
-        foreach ($this->constantsSourceToDestination as $source => $destination) {
+        foreach ($this->constantsToExport as $source => $destination) {
             try {
                 $destinationFilePath = $this->getDestinationFilePath($source, $destination);
                 $this->copyConstantsToDestination($source, $destinationFilePath);
             } catch (\Exception $e)
             {
-                var_dump($e->getMessage());
+                throw new ConstantsNotExportedException($e->getMessage(), $e->getCode(), $e);
             }
         }
+        return true;
     }
 
+    /**
+     * @param string $source
+     * @param string $destination
+     * @return string
+     * @throws \ReflectionException
+     */
     private function getDestinationFilePath(string $source, string $destination): string
     {
         $destination = rtrim($destination, '/');
 
         if (is_dir($destination)) {
             $newFileName = (new \ReflectionClass($source))->getShortName();
-            $destination = $destination . DIRECTORY_SEPARATOR . $newFileName . $this->destinationFileExt;
+            $destination = $destination . DIRECTORY_SEPARATOR . $newFileName . self::DESTINATION_FILE_EXTENSION;
         }
 
         return $destination;
@@ -58,13 +92,17 @@ $generatedJsConstants
 
 EOD;
 
-        file_put_contents($destination, $fileContent, FILE_APPEND);
+        $this->fileService->put($destination, $fileContent);
     }
 
+    /**
+     * @param array $constants
+     * @return string
+     */
     private function getJsKeyValuePairFromConstants(array $constants): string
     {
         $result = '';
-        $indentationCharacter = $this->indentationCharacter;
+        $indentationCharacter = self::INDENTATION_CHARACTER;
 
         foreach ($constants as $key => $value) {
             $result .= "$indentationCharacter$key: '$value'," . PHP_EOL;

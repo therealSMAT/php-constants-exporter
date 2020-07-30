@@ -10,7 +10,7 @@ $constantsSourceToDestination = [
 
 $constantsExporter = new \Therealsmat\ConstantsExporter();
 
-$constantsExporter->setConstantsSourceToDestination(
+$constantsExporter->setConstantsToExport(
     $constantsSourceToDestination
 );
 
