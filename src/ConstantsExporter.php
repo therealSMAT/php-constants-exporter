@@ -35,20 +35,9 @@ class ConstantsExporter
     }
 
     /**
-     * @param array $constantsToExport
-     * @return $this
-     */
-    public function setConstantsToExport(array $constantsToExport): self
-    {
-        $this->constantsToExport = $constantsToExport;
-        return $this;
-    }
-
-    /**
-     * @return bool
      * @throws ConstantsNotExportedException
      */
-    public function perform(): bool
+    public function __destruct()
     {
         foreach ($this->constantsToExport as $source => $destination) {
             try {
@@ -59,7 +48,16 @@ class ConstantsExporter
                 throw new ConstantsNotExportedException($e->getMessage(), $e->getCode(), $e);
             }
         }
-        return true;
+    }
+
+    /**
+     * @param array $constantsToExport
+     * @return $this
+     */
+    public function setConstantsToExport(array $constantsToExport): self
+    {
+        $this->constantsToExport = $constantsToExport;
+        return $this;
     }
 
     /**

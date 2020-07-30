@@ -21,17 +21,16 @@ class ConstantsExporterTest extends TestCase
     public function testConstantsAreExportedToCorrectPaths()
     {
         $mock = Mockery::mock('overload:' . FileService::class);
+
         $mock->allows()
             ->put(SimpleConstantsStub::$jsFileName, SimpleConstantsStub::content())
             ->once()
             ->andReturn(Mockery::type('int'));
 
         try {
-            $performed = (new ConstantsExporter())
-                ->setConstantsToExport([SimpleConstantsStub::class => self::FILE_DIR])
-                ->perform();
+            (new ConstantsExporter())->setConstantsToExport([SimpleConstantsStub::class => self::FILE_DIR]);
 
-            $this->assertTrue($performed);
+            $this->assertTrue(true);
         } catch (ConstantsNotExportedException $e) {
             //
         }
@@ -46,17 +45,15 @@ class ConstantsExporterTest extends TestCase
             ->andReturn(Mockery::type('int'));
 
         try {
-            $performed = (new ConstantsExporter(
-                [SimpleConstantsStub::class => self::FILE_DIR]
-            ))->perform();
-
-            $this->assertTrue($performed);
+            new ConstantsExporter([SimpleConstantsStub::class => self::FILE_DIR]);
+            $this->assertTrue(true);
         } catch (ConstantsNotExportedException $e) {
             var_dump($e->getMessage());
         }
     }
 }
 
+// Next, we test that it only copies constants from own class, and does not copy inherited constants...
 
 class SimpleConstantsStub
 {
