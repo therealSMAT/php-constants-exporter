@@ -3,6 +3,7 @@
 namespace Therealsmat;
 
 use Therealsmat\Services\FileService;
+use Therealsmat\Contracts\ConstantsFormatterInterface;
 use Therealsmat\Exceptions\ConstantsNotExportedException;
 
 /**
@@ -11,13 +12,17 @@ use Therealsmat\Exceptions\ConstantsNotExportedException;
  */
 class ConstantsExporter
 {
-    const INDENTATION_CHARACTER = '    '; // 4 spaces instead of a tab
     const DESTINATION_FILE_EXTENSION = '.js';
 
     /**
      * @var FileService
      */
     private $fileService;
+
+    /**
+     * @var ConstantsFormatterInterface
+     */
+    private $constantsExporter;
 
     /**
      * @var array
@@ -32,6 +37,7 @@ class ConstantsExporter
     {
         $this->constantsToExport = $constantsToExport;
         $this->fileService = new FileService;
+        $this->constantsExporter = new JsConstantsFormatter;
     }
 
     /**
@@ -86,33 +92,11 @@ class ConstantsExporter
     private function copyConstantsToDestination($source, $destination)
     {
         $reflectionClass = new \ReflectionClass($source);
-        $constantName = $reflectionClass->getShortName();
 
-        $generatedJsConstants = $this->getJsKeyValuePairFromConstants($reflectionClass->getConstants());
+        $generatedJsConstants = $this->constantsExporter
+            ->setConstants($reflectionClass->getShortName(), $reflectionClass->getConstants())
+            ->format();
 
-        $fileContent = <<<EOD
-export const $constantName = {
-$generatedJsConstants
-};
-
-EOD;
-
-        $this->fileService->put($destination, $fileContent);
-    }
-
-    /**
-     * @param array $constants
-     * @return string
-     */
-    private function getJsKeyValuePairFromConstants(array $constants): string
-    {
-        $result = '';
-        $indentationCharacter = self::INDENTATION_CHARACTER;
-
-        foreach ($constants as $key => $value) {
-            $result .= "$indentationCharacter$key: '$value'," . PHP_EOL;
-        }
-        $result = rtrim($result, PHP_EOL);
-        return $result;
+        $this->fileService->put($destination, $generatedJsConstants);
     }
 }
