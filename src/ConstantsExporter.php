@@ -2,6 +2,7 @@
 
 namespace Therealsmat;
 
+use \ReflectionClass;
 use Therealsmat\Services\FileService;
 use Therealsmat\Contracts\ConstantsFormatterInterface;
 use Therealsmat\Exceptions\ConstantsNotExportedException;
@@ -28,6 +29,11 @@ class ConstantsExporter
      * @var array
      */
     private $constantsToExport = [];
+
+    /**
+     * @var bool
+     */
+    private $shouldExcludeParentConstants = false;
 
     /**
      * ConstantsExporter constructor.
@@ -67,6 +73,15 @@ class ConstantsExporter
     }
 
     /**
+     * @return $this
+     */
+    public function excludingParentConstants(): self
+    {
+        $this->shouldExcludeParentConstants = true;
+        return $this;
+    }
+
+    /**
      * @param string $source
      * @param string $destination
      * @return string
@@ -77,7 +92,7 @@ class ConstantsExporter
         $destination = rtrim($destination, '/');
 
         if (is_dir($destination)) {
-            $newFileName = (new \ReflectionClass($source))->getShortName();
+            $newFileName = (new ReflectionClass($source))->getShortName();
             $destination = $destination . DIRECTORY_SEPARATOR . $newFileName . self::DESTINATION_FILE_EXTENSION;
         }
 
@@ -91,12 +106,46 @@ class ConstantsExporter
      */
     private function copyConstantsToDestination($source, $destination)
     {
-        $reflectionClass = new \ReflectionClass($source);
+        $reflectionClass = new ReflectionClass($source);
+        $constants = $this->getReflectedClassConstants($reflectionClass);
 
         $generatedJsConstants = $this->constantsExporter
-            ->setConstants($reflectionClass->getShortName(), $reflectionClass->getConstants())
+            ->setConstants($reflectionClass->getShortName(), $constants)
             ->format();
 
         $this->fileService->put($destination, $generatedJsConstants);
+    }
+
+    /**
+     * @param ReflectionClass $reflectionClass
+     * @return array
+     */
+    private function getReflectedClassConstants(ReflectionClass $reflectionClass): array
+    {
+        if ($this->shouldExcludeParentConstants === false) {
+            return $reflectionClass->getConstants();
+        }
+
+        return array_diff(
+            $reflectionClass->getConstants(),
+            $this->getAncestorsConstants($reflectionClass->getParentClass())
+        );
+    }
+
+    /**
+     * @param ReflectionClass $reflectionClass
+     * @return array
+     */
+    private function getAncestorsConstants(ReflectionClass $reflectionClass): array
+    {
+        $constants = [];
+
+        $constants = array_merge($constants, $reflectionClass->getConstants());
+
+        if ($reflectionClass->getParentClass() !== false) {
+            $this->getAncestorsConstants($reflectionClass->getParentClass());
+        }
+
+        return $constants;
     }
 }
