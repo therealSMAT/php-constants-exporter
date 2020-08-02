@@ -2,7 +2,8 @@
 
 namespace Therealsmat;
 
-use \ReflectionClass;
+use Exception;
+use ReflectionClass;
 use Therealsmat\Services\FileService;
 use Therealsmat\Contracts\ConstantsFormatterInterface;
 use Therealsmat\Exceptions\ConstantsNotExportedException;
@@ -55,7 +56,7 @@ class ConstantsExporter
             try {
                 $destinationFilePath = $this->getDestinationFilePath($source, $destination);
                 $this->copyConstantsToDestination($source, $destinationFilePath);
-            } catch (\Exception $e)
+            } catch (Exception $e)
             {
                 throw new ConstantsNotExportedException($e->getMessage(), $e->getCode(), $e);
             }
@@ -100,11 +101,11 @@ class ConstantsExporter
     }
 
     /**
-     * @param $source
-     * @param $destination
+     * @param string $source
+     * @param string $destination
      * @throws \ReflectionException
      */
-    private function copyConstantsToDestination($source, $destination)
+    private function copyConstantsToDestination(string $source, string $destination)
     {
         $reflectionClass = new ReflectionClass($source);
         $constants = $this->getReflectedClassConstants($reflectionClass);
