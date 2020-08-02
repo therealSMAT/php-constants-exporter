@@ -23,7 +23,7 @@ class ConstantsExporter
     /**
      * @var ConstantsFormatterInterface
      */
-    private $constantsExporter;
+    private $constantsFormatter;
 
     /**
      * @var array
@@ -43,7 +43,7 @@ class ConstantsExporter
     {
         $this->constantsToExport = $constantsToExport;
         $this->fileService = new FileService;
-        $this->constantsExporter = new JsConstantsFormatter;
+        $this->constantsFormatter = new JsConstantsFormatter;
     }
 
     /**
@@ -109,7 +109,7 @@ class ConstantsExporter
         $reflectionClass = new ReflectionClass($source);
         $constants = $this->getReflectedClassConstants($reflectionClass);
 
-        $generatedJsConstants = $this->constantsExporter
+        $generatedJsConstants = $this->constantsFormatter
             ->setConstants($reflectionClass->getShortName(), $constants)
             ->format();
 
