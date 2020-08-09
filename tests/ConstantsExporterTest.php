@@ -5,7 +5,7 @@ namespace Tests;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 use Therealsmat\ConstantsExporter;
-use Therealsmat\Services\FileService;
+use Therealsmat\Services\FileHelper;
 
 class ConstantsExporterTest extends TestCase
 {
@@ -19,7 +19,7 @@ class ConstantsExporterTest extends TestCase
 
     public function testConstantsAreExportedToCorrectPaths()
     {
-        $this->mockFileService(SimpleConstantsStub::$jsFileName, SimpleConstantsStub::content());
+        $this->mockFileHelper(SimpleConstantsStub::$jsFileName, SimpleConstantsStub::content());
 
         (new ConstantsExporter)
             ->setConstantsToExport([SimpleConstantsStub::class => self::FILE_DIR]);
@@ -28,7 +28,7 @@ class ConstantsExporterTest extends TestCase
 
     public function testConstantsCanBePassedFromTheConstructor()
     {
-        $this->mockFileService(SimpleConstantsStub::$jsFileName, SimpleConstantsStub::content());
+        $this->mockFileHelper(SimpleConstantsStub::$jsFileName, SimpleConstantsStub::content());
 
         new ConstantsExporter([SimpleConstantsStub::class => self::FILE_DIR]);
         $this->assertTrue(true);
@@ -36,7 +36,7 @@ class ConstantsExporterTest extends TestCase
 
     public function testParentConstantsMayBeExcludedFromExportedConstants()
     {
-        $this->mockFileService(ChildConstantsStub::$jsFileName, ChildConstantsStub::shallowContent());
+        $this->mockFileHelper(ChildConstantsStub::$jsFileName, ChildConstantsStub::shallowContent());
 
         (new ConstantsExporter)
             ->setConstantsToExport([ChildConstantsStub::class => self::FILE_DIR])
@@ -46,7 +46,7 @@ class ConstantsExporterTest extends TestCase
 
     public function testAncestorConstantsMayBeExcludedFromExportedConstants()
     {
-        $this->mockFileService(DescendantConstantsStub::$jsFileName, DescendantConstantsStub::shallowContent());
+        $this->mockFileHelper(DescendantConstantsStub::$jsFileName, DescendantConstantsStub::shallowContent());
 
         (new ConstantsExporter)
             ->setConstantsToExport([DescendantConstantsStub::class => self::FILE_DIR])
@@ -56,7 +56,7 @@ class ConstantsExporterTest extends TestCase
 
     public function testItCopiesAllInheritedConstantsByDefault()
     {
-        $this->mockFileService(DescendantConstantsStub::$jsFileName, DescendantConstantsStub::content());
+        $this->mockFileHelper(DescendantConstantsStub::$jsFileName, DescendantConstantsStub::content());
 
         (new ConstantsExporter)
             ->setConstantsToExport([DescendantConstantsStub::class => self::FILE_DIR]);
@@ -67,9 +67,11 @@ class ConstantsExporterTest extends TestCase
      * @param string $filename
      * @param string $content
      */
-    private function mockFileService(string $filename, string $content)
+    private function mockFileHelper(string $filename, string $content, bool $destinationisDir = true)
     {
-        $mock = Mockery::mock('overload:' . FileService::class);
+        $mock = Mockery::mock('overload:' . FileHelper::class);
+        
+        $mock->allows()->isDir(Mockery::type('string'))->once()->andReturn($destinationisDir);
         $mock->allows()->put($filename, $content)->once()->andReturn(Mockery::type('int'));
     }
 }

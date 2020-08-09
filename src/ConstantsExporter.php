@@ -4,7 +4,7 @@ namespace Therealsmat;
 
 use Exception;
 use ReflectionClass;
-use Therealsmat\Services\FileService;
+use Therealsmat\Services\FileHelper;
 use Therealsmat\Contracts\ConstantsFormatterInterface;
 use Therealsmat\Exceptions\ConstantsNotExportedException;
 
@@ -17,9 +17,9 @@ class ConstantsExporter
     const DESTINATION_FILE_EXTENSION = '.js';
 
     /**
-     * @var FileService
+     * @var FileHelper
      */
-    private $fileService;
+    private $fileHelper;
 
     /**
      * @var ConstantsFormatterInterface
@@ -43,7 +43,7 @@ class ConstantsExporter
     public function __construct(array $constantsToExport = [])
     {
         $this->constantsToExport = $constantsToExport;
-        $this->fileService = new FileService;
+        $this->fileHelper = new FileHelper;
         $this->constantsFormatter = new JsConstantsFormatter;
     }
 
@@ -92,7 +92,7 @@ class ConstantsExporter
     {
         $destination = rtrim($destination, '/');
 
-        if (is_dir($destination)) {
+        if ($this->fileHelper->isDir($destination)) {
             $newFileName = (new ReflectionClass($source))->getShortName();
             $destination = $destination . DIRECTORY_SEPARATOR . $newFileName . self::DESTINATION_FILE_EXTENSION;
         }
@@ -109,12 +109,17 @@ class ConstantsExporter
     {
         $reflectionClass = new ReflectionClass($source);
         $constants = $this->getReflectedClassConstants($reflectionClass);
+        $constantName = $reflectionClass->getShortName();
 
         $generatedJsConstants = $this->constantsFormatter
-            ->setConstants($reflectionClass->getShortName(), $constants)
+            ->setConstants($constantName, $constants)
             ->format();
 
-        $this->fileService->put($destination, $generatedJsConstants);
+        if ($this->destinationAlreadyHasConstant($constantName, $destination)) {
+            // Update the file instead of writing directly to it...
+        } else {
+            $this->fileHelper->put($destination, $generatedJsConstants);
+        }
     }
 
     /**
@@ -148,5 +153,21 @@ class ConstantsExporter
         }
 
         return $constants;
+    }
+
+    /**
+     * @param string $constantName
+     * @param string $filePath
+     * @return bool
+     */
+    private function destinationAlreadyHasConstant(string $constantName, string $filePath): bool
+    {
+        preg_match(
+            "/export const $constantName = {([^}]+)}/",
+            $this->fileHelper->readContents($filePath),
+            $matches
+        );
+
+        return !empty($matches);
     }
 }
