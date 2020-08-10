@@ -67,12 +67,18 @@ class ConstantsExporterTest extends TestCase
      * @param string $filename
      * @param string $content
      */
-    private function mockFileHelper(string $filename, string $content, bool $destinationisDir = true)
-    {
+    private function mockFileHelper(
+        string $filename,
+        string $content,
+        bool $destinationisDir = true,
+        bool $fileExists = false,
+        int $putFlag = FILE_APPEND
+    ) {
         $mock = Mockery::mock('overload:' . FileHelper::class);
-        
+
+        $mock->allows()->fileExists($filename)->once()->andReturn($fileExists);
         $mock->allows()->isDir(Mockery::type('string'))->once()->andReturn($destinationisDir);
-        $mock->allows()->put($filename, $content)->once()->andReturn(Mockery::type('int'));
+        $mock->allows()->put($filename, $content, $putFlag)->once()->andReturn(Mockery::type('int'));
     }
 }
 

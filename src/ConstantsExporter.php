@@ -171,7 +171,7 @@ class ConstantsExporter
      */
     private function destinationHasSameConstant(string $constantName, string $filePath): bool
     {
-        if (!is_file($filePath)) {
+        if (!$this->fileHelper->fileExists($filePath)) {
             return false;
         }
 

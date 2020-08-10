@@ -8,18 +8,18 @@ class FileHelper
      * @param string $filePath
      * @return bool
      */
-    public function isDir(string $filePath): bool
+    public function fileExists(string $filePath): bool
     {
-        return is_dir($filePath);
+        return is_file($filePath);
     }
 
     /**
      * @param string $filePath
-     * @return string
+     * @return bool
      */
-    public function readContents(string $filePath): string
+    public function isDir(string $filePath): bool
     {
-        return file_get_contents($filePath);
+        return is_dir($filePath);
     }
 
     /**
@@ -31,5 +31,14 @@ class FileHelper
     public function put(string $filePath, string $content, int $flags = 0)
     {
         return file_put_contents($filePath, $content, $flags);
+    }
+
+    /**
+     * @param string $filePath
+     * @return string
+     */
+    public function readContents(string $filePath): string
+    {
+        return file_get_contents($filePath);
     }
 }
