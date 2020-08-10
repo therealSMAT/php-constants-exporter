@@ -115,11 +115,20 @@ class ConstantsExporter
             ->setConstants($constantName, $constants)
             ->format();
 
-        if ($this->destinationAlreadyHasConstant($constantName, $destination)) {
-            // Update the file instead of writing directly to it...
-        } else {
-            $this->fileHelper->put($destination, $generatedJsConstants);
+
+        if (!$this->destinationHasSameConstant($constantName, $destination)) {
+            $this->fileHelper->put($destination, $generatedJsConstants, FILE_APPEND);
+            return;
         }
+
+        $this->fileHelper->put(
+            $destination,
+            preg_replace(
+                $this->getRegexPattern($constantName),
+                $generatedJsConstants,
+                $this->fileHelper->readContents($destination)
+            )
+        );
     }
 
     /**
@@ -160,14 +169,27 @@ class ConstantsExporter
      * @param string $filePath
      * @return bool
      */
-    private function destinationAlreadyHasConstant(string $constantName, string $filePath): bool
+    private function destinationHasSameConstant(string $constantName, string $filePath): bool
     {
+        if (!is_file($filePath)) {
+            return false;
+        }
+
         preg_match(
-            "/export const $constantName = {([^}]+)}/",
+            $this->getRegexPattern($constantName),
             $this->fileHelper->readContents($filePath),
             $matches
         );
 
         return !empty($matches);
+    }
+
+    /**
+     * @param string $constantName
+     * @return string
+     */
+    private function getRegexPattern(string $constantName): string
+    {
+        return "/export const $constantName = {([^}]+)};\n/";
     }
 }
