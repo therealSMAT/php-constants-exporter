@@ -50,7 +50,7 @@ class ConstantsExporter
     /**
      * @throws ConstantsNotExportedException
      */
-    public function __destruct()
+    public function export()
     {
         foreach ($this->constantsToExport as $source => $destination) {
             try {
