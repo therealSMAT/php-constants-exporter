@@ -22,7 +22,7 @@ class ConstantsExporterTest extends TestCase
         $this->mockFileHelper(SimpleConstantsStub::$jsFileName, SimpleConstantsStub::content());
 
         (new ConstantsExporter)
-            ->setConstantsToExport([SimpleConstantsStub::class => self::FILE_DIR])
+            ->setConstants([SimpleConstantsStub::class => self::FILE_DIR])
             ->export();
         $this->assertTrue(true);
     }
@@ -40,7 +40,7 @@ class ConstantsExporterTest extends TestCase
         $this->mockFileHelper(ChildConstantsStub::$jsFileName, ChildConstantsStub::shallowContent());
 
         (new ConstantsExporter)
-            ->setConstantsToExport([ChildConstantsStub::class => self::FILE_DIR])
+            ->setConstants([ChildConstantsStub::class => self::FILE_DIR])
             ->excludingParentConstants()
             ->export();
         $this->assertTrue(true);
@@ -51,7 +51,7 @@ class ConstantsExporterTest extends TestCase
         $this->mockFileHelper(DescendantConstantsStub::$jsFileName, DescendantConstantsStub::shallowContent());
 
         (new ConstantsExporter)
-            ->setConstantsToExport([DescendantConstantsStub::class => self::FILE_DIR])
+            ->setConstants([DescendantConstantsStub::class => self::FILE_DIR])
             ->excludingParentConstants()
             ->export();
         $this->assertTrue(true);
@@ -62,7 +62,7 @@ class ConstantsExporterTest extends TestCase
         $this->mockFileHelper(DescendantConstantsStub::$jsFileName, DescendantConstantsStub::content());
 
         (new ConstantsExporter)
-            ->setConstantsToExport([DescendantConstantsStub::class => self::FILE_DIR])
+            ->setConstants([DescendantConstantsStub::class => self::FILE_DIR])
             ->export();
         $this->assertTrue(true);
     }

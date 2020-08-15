@@ -1,4 +1,54 @@
-## Todo's
-- [ ] Sort constants in ascending or descending order
-- [ ] Check if constants key already exists in file to avoid duplicates
-- [ ] Release version 1.0.0
+<h2 align="center">PHP Constants Exporter :zap:</h2>
+
+## Introduction
+
+PHP Constants Exporter provides a simple way to re-use your php constants on the frontend; Javascript.
+
+## Basic Example
+```php
+<?php
+use Therealsmat\ConstantsExporter;
+
+$constants = [
+    Months::class => 'js/',
+    PayoutTypes::class => 'js/'
+];
+
+(new ConstantsExporter)
+    ->setConstants($constants)
+    ->export();
+```
+
+`$constants` is an array of `key => value` pairs. The key is the constants file: the source, while the value is the destination. 
+
+A valid destination is:
+
+- An existing directory; or
+- A filename.
+
+If the destination is a directory, then the directory must exist. A filename same as the PHP constants filename would be generated with a `.js` extension.
+
+Your constants would be exported safely to your destination, and ready for use.
+
+### Exporting Multiple Times
+If you export the same constant to the same destination multiple times, the existing content would be overwritten.
+ 
+This can be useful for keeping the backend and frontend constants in sync.
+ 
+### Excluding parent constants
+If your source file extends a base class (like an ORM), you may only export its own constants by calling the `excludingParentsConstants()` method.
+
+```php
+<?php
+use Therealsmat\ConstantsExporter;
+
+$constants = [
+    Months::class => 'js/',
+    PayoutTypes::class => 'js/'
+];
+
+(new ConstantsExporter)
+    ->setConstants($constants)
+    ->excludingParentConstants()
+    ->export();
+```

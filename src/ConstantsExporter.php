@@ -29,7 +29,7 @@ class ConstantsExporter
     /**
      * @var array
      */
-    private $constantsToExport = [];
+    private $constants = [];
 
     /**
      * @var bool
@@ -38,11 +38,11 @@ class ConstantsExporter
 
     /**
      * ConstantsExporter constructor.
-     * @param array $constantsToExport
+     * @param array $constants
      */
-    public function __construct(array $constantsToExport = [])
+    public function __construct(array $constants = [])
     {
-        $this->constantsToExport = $constantsToExport;
+        $this->constants = $constants;
         $this->fileHelper = new FileHelper;
         $this->constantsFormatter = new JsConstantsFormatter;
     }
@@ -52,7 +52,7 @@ class ConstantsExporter
      */
     public function export()
     {
-        foreach ($this->constantsToExport as $source => $destination) {
+        foreach ($this->constants as $source => $destination) {
             try {
                 $destinationFilePath = $this->getDestinationFilePath($source, $destination);
                 $this->copyConstantsToDestination($source, $destinationFilePath);
@@ -67,9 +67,9 @@ class ConstantsExporter
      * @param array $constantsToExport
      * @return $this
      */
-    public function setConstantsToExport(array $constantsToExport): self
+    public function setConstants(array $constantsToExport): self
     {
-        $this->constantsToExport = $constantsToExport;
+        $this->constants = $constantsToExport;
         return $this;
     }
 
@@ -137,11 +137,11 @@ class ConstantsExporter
      */
     private function getReflectedClassConstants(ReflectionClass $reflectionClass): array
     {
-        if ($this->shouldExcludeParentConstants === false) {
+        if (!$this->shouldExcludeParentConstants || !$reflectionClass->getParentClass()) {
             return $reflectionClass->getConstants();
         }
 
-        return array_diff(
+        return array_diff_key(
             $reflectionClass->getConstants(),
             $this->getAncestorsConstants($reflectionClass->getParentClass())
         );
