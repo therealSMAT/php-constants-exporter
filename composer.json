@@ -7,13 +7,17 @@
   "authors": [{
     "name": "Tosin Soremekun",
     "email": "me@tosinsoremekun.com",
-    "role": "Developer"
+    "role": "Developer",
+    "homepage": "https://tosinsoremekun.com"
   }],
   "autoload": {
     "psr-4": {
       "Therealsmat\\": "src/",
       "Tests\\": "tests/"
     }
+  },
+  "require": {
+    "php": ">=7.1.0"
   },
   "require-dev": {
     "phpunit/phpunit": "^9",
