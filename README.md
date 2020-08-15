@@ -8,6 +8,10 @@ PHP Constants Exporter provides a simple way to re-use your php constants on the
 
 PHP 7.1+
 
+## Installation
+
+`composer require therealsmat/php-constants-exporter`
+
 ## Basic Example
 ```php
 <?php
