@@ -30,13 +30,13 @@ If the destination is a directory, then the directory must exist. A filename sam
 
 Your constants would be exported safely to your destination, and ready for use.
 
-### Exporting Multiple Times
+### Multiple Executions
 If you export the same constant to the same destination multiple times, the existing content would be overwritten.
  
 This can be useful for keeping the backend and frontend constants in sync.
  
-### Excluding parent constants
-If your source file extends a base class (like an ORM), you may only export its own constants by calling the `excludingParentsConstants()` method.
+### Excluding Inherited Constants
+If your source file extends a base class (e.g an ORM), you may only export its own constants by calling the `excludeInheritedConstants()` method.
 
 ```php
 <?php
@@ -49,6 +49,6 @@ $constants = [
 
 (new ConstantsExporter)
     ->setConstants($constants)
-    ->excludingParentConstants()
+    ->excludeInheritedConstants()
     ->export();
 ```

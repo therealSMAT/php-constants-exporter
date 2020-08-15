@@ -34,7 +34,7 @@ class ConstantsExporter
     /**
      * @var bool
      */
-    private $shouldExcludeParentConstants = false;
+    private $shouldExcludeInheritedConstants = false;
 
     /**
      * ConstantsExporter constructor.
@@ -76,9 +76,9 @@ class ConstantsExporter
     /**
      * @return $this
      */
-    public function excludingParentConstants(): self
+    public function excludeInheritedConstants(): self
     {
-        $this->shouldExcludeParentConstants = true;
+        $this->shouldExcludeInheritedConstants = true;
         return $this;
     }
 
@@ -137,7 +137,7 @@ class ConstantsExporter
      */
     private function getReflectedClassConstants(ReflectionClass $reflectionClass): array
     {
-        if (!$this->shouldExcludeParentConstants || !$reflectionClass->getParentClass()) {
+        if (!$this->shouldExcludeInheritedConstants || !$reflectionClass->getParentClass()) {
             return $reflectionClass->getConstants();
         }
 

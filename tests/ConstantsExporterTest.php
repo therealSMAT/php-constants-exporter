@@ -41,7 +41,7 @@ class ConstantsExporterTest extends TestCase
 
         (new ConstantsExporter)
             ->setConstants([ChildConstantsStub::class => self::FILE_DIR])
-            ->excludingParentConstants()
+            ->excludeInheritedConstants()
             ->export();
         $this->assertTrue(true);
     }
@@ -52,7 +52,7 @@ class ConstantsExporterTest extends TestCase
 
         (new ConstantsExporter)
             ->setConstants([DescendantConstantsStub::class => self::FILE_DIR])
-            ->excludingParentConstants()
+            ->excludeInheritedConstants()
             ->export();
         $this->assertTrue(true);
     }
@@ -70,18 +70,21 @@ class ConstantsExporterTest extends TestCase
     /**
      * @param string $filename
      * @param string $content
+     * @param bool $isDestinationDir
+     * @param bool $fileExists
+     * @param int $putFlag
      */
     private function mockFileHelper(
         string $filename,
         string $content,
-        bool $destinationisDir = true,
+        bool $isDestinationDir = true,
         bool $fileExists = false,
         int $putFlag = FILE_APPEND
     ) {
         $mock = Mockery::mock('overload:' . FileHelper::class);
 
         $mock->allows()->fileExists($filename)->once()->andReturn($fileExists);
-        $mock->allows()->isDir(Mockery::type('string'))->once()->andReturn($destinationisDir);
+        $mock->allows()->isDir(Mockery::type('string'))->once()->andReturn($isDestinationDir);
         $mock->allows()->put($filename, $content, $putFlag)->once()->andReturn(Mockery::type('int'));
     }
 }
@@ -177,16 +180,16 @@ class ThirdAncestorConstantsStub extends SecondAncestorConstantsStub
 
 class DescendantConstantsStub extends ThirdAncestorConstantsStub
 {
-    const SIXTEEN = 16;
-    const SEVENTEEN = 17;
+    const SIXTEEN = 11; // This ensures that the constant name is considered and not value
+    const SEVENTEEN = 12;
 
     public static $jsFileName = ConstantsExporterTest::FILE_DIR . 'DescendantConstantsStub.js';
 
     public static function content()
     {
         return "export const DescendantConstantsStub = {
-    SIXTEEN: '16',
-    SEVENTEEN: '17',
+    SIXTEEN: '11',
+    SEVENTEEN: '12',
     ELEVEN: '11',
     TWELVE: '12',
     THIRTEEN: '13',
@@ -209,8 +212,8 @@ class DescendantConstantsStub extends ThirdAncestorConstantsStub
     public static function shallowContent()
     {
         return "export const DescendantConstantsStub = {
-    SIXTEEN: '16',
-    SEVENTEEN: '17',
+    SIXTEEN: '11',
+    SEVENTEEN: '12',
 };
 ";
     }
