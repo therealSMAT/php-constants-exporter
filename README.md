@@ -1,7 +1,7 @@
 <h2 align="center">PHP Constants Exporter :zap:</h2>
 
 <p align="center">
-<a href="https://github.com/therealsmat/php-constants-exporter/actions"><img src="https://github.com/therealsmat/php-constants-exporter/workflows/.github/workflows/php.yml/badge.svg" alt="Build Status"></a>
+<a href="https://github.com/therealsmat/php-constants-exporter/actions"><img src="https://github.com/therealsmat/php-constants-exporter/workflows/PHP%20Composer/badge.svg" alt="Build Status"></a>
 <a href="https://packagist.org/packages/therealsmat/php-constants-exporter"><img src="https://poser.pugx.org/therealsmat/php-constants-exporter/d/total.svg" alt="Total Downloads"></a>
 <a href="https://packagist.org/packages/therealsmat/php-constants-exporter"><img src="https://poser.pugx.org/therealsmat/php-constants-exporter/v/stable.svg" alt="Latest Stable Version"></a>
 <a href="https://packagist.org/packages/therealsmat/php-constants-exporter"><img src="https://poser.pugx.org/therealsmat/php-constants-exporter/license.svg" alt="License"></a>
